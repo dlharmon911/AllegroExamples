@@ -30,7 +30,7 @@ enum G_DRAWING_MODE
 	G_MODE_COUNT
 };
 
-static const char* const G_TITLE = "Framework!";
+static const char* const G_TITLE = "Drawing Bitmaps!";
 static const g_point_t G_DISPLAY_INITIAL_SIZE = { 500.0f, 500.0f };
 static const g_point_t G_GAME_SCREEN_SIZE = { 500.0f, 500.0f };
 static const double G_LOGIC_TIMER_RATE = 60.0;
@@ -252,7 +252,6 @@ static void g_app_logic(g_app_data_t* data)
 	{
 		data->m_mode = G_MODE_DOUBLE_BUFFER;
 	}
-	
 }
 
 static void g_app_draw_inventory(const g_app_data_t* data)
