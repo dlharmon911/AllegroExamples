@@ -25,6 +25,7 @@ typedef struct g_app_data_t
 
 enum G_DRAWING_MODE
 {
+	G_MODE_DEFAULT,
 	G_MODE_DOUBLE_BUFFER,
 	G_MODE_TRANSFORM,
 	G_MODE_COUNT
@@ -38,6 +39,7 @@ static const ALLEGRO_COLOR G_COLOR_EIGENGRAU = { 0.08627451f, 0.08627451f, 0.113
 static const ALLEGRO_COLOR G_COLOR_WHITE = { 1.0f, 1.0f, 1.0f, 1.0f };
 static const char* G_MODE_NAME[G_MODE_COUNT] =
 {
+	"Default",
 	"Double Buffer",
 	"Transform"
 };
@@ -82,7 +84,7 @@ static void g_app_zero_initialize_data(g_app_data_t* data)
 	data->m_inventory = NULL;
 	data->m_double_buffer = NULL;
 	data->m_font = NULL;
-	data->m_mode = G_MODE_DOUBLE_BUFFER;
+	data->m_mode = G_MODE_DEFAULT;
 	data->m_fps = 0.0;
 	data->m_is_running = true;
 	data->m_update_logic = false;
@@ -228,6 +230,11 @@ static void g_app_input(g_app_data_t* data)
 			data->m_key[event.keyboard.keycode] = true;
 		} break;
 
+		case ALLEGRO_EVENT_DISPLAY_RESIZE:
+		{
+			al_acknowledge_resize(event.display.source);
+		} break;
+
 		case ALLEGRO_EVENT_DISPLAY_CLOSE:
 		{
 			data->m_is_running = false;
@@ -244,13 +251,17 @@ static void g_app_logic(g_app_data_t* data)
 		data->m_is_running = false;
 	}
 
-	if (data->m_key[ALLEGRO_KEY_SPACE])
+	if (data->m_key[ALLEGRO_KEY_1])
 	{
-		data->m_mode = G_MODE_TRANSFORM;
+		data->m_mode = G_MODE_DEFAULT;
 	}
-	else
+	if (data->m_key[ALLEGRO_KEY_2])
 	{
 		data->m_mode = G_MODE_DOUBLE_BUFFER;
+	}
+	if (data->m_key[ALLEGRO_KEY_3])
+	{
+		data->m_mode = G_MODE_TRANSFORM;
 	}
 }
 
@@ -280,12 +291,13 @@ static void g_app_draw_mode_transform(const g_app_data_t* data)
 {
 	ALLEGRO_TRANSFORM backup;
 	ALLEGRO_TRANSFORM transform;
-	float x_scale = (float)al_get_bitmap_width(data->m_double_buffer) / (float)al_get_display_width(data->m_display);
-	float y_scale = (float)al_get_bitmap_height(data->m_double_buffer) / (float)al_get_display_height(data->m_display);
+	float x_scale = (float)al_get_display_width(data->m_display) / (float)al_get_bitmap_width(data->m_double_buffer);
+	float y_scale = (float)al_get_display_height(data->m_display) / (float)al_get_bitmap_height(data->m_double_buffer);
 
 	al_copy_transform(&backup, al_get_current_transform());
 	al_identity_transform(&transform);
 	al_scale_transform(&transform, x_scale, y_scale);
+	al_compose_transform(&transform, &backup);
 	al_use_transform(&transform);
 
 	g_app_draw_inventory(data);
@@ -296,7 +308,7 @@ static void g_app_draw_mode_transform(const g_app_data_t* data)
 static void g_app_draw(const g_app_data_t* data)
 {
 	void (*func_array[G_MODE_COUNT])(const g_app_data_t * data) =
-	{
+	{ g_app_draw_inventory,
 		g_app_draw_mode_double_buffer,
 		g_app_draw_mode_transform
 	};
