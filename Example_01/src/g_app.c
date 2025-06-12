@@ -283,7 +283,7 @@ static void g_app_draw_mode_double_buffer(const g_app_data_t* data)
 		0.0f, 0.0f,
 		(float)al_get_bitmap_width(data->m_double_buffer), (float)al_get_bitmap_height(data->m_double_buffer),
 		0.0f, 0.0f,
-		(float)al_get_display_width(data->m_display), (float)al_get_display_height(data->m_display),
+		(float)al_get_bitmap_width(target), (float)al_get_bitmap_height(target),
 		0);
 }
 
@@ -291,8 +291,9 @@ static void g_app_draw_mode_transform(const g_app_data_t* data)
 {
 	ALLEGRO_TRANSFORM backup;
 	ALLEGRO_TRANSFORM transform;
-	float x_scale = (float)al_get_display_width(data->m_display) / (float)al_get_bitmap_width(data->m_double_buffer);
-	float y_scale = (float)al_get_display_height(data->m_display) / (float)al_get_bitmap_height(data->m_double_buffer);
+	ALLEGRO_BITMAP* target = al_get_target_bitmap();
+	float x_scale = (float)al_get_bitmap_width(target) / (float)al_get_bitmap_width(data->m_double_buffer);
+	float y_scale = (float)al_get_bitmap_height(target) / (float)al_get_bitmap_height(data->m_double_buffer);
 
 	al_copy_transform(&backup, al_get_current_transform());
 	al_identity_transform(&transform);
